@@ -5,10 +5,41 @@ const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/cat-ebay");
 
 
+// Schema class from Mongoose
+const Schema = mongoose.Schema;
+
+// use Mongoose's Schema class to create our schema object
+// (the schema is the STRUCTURE of documents in the model's collection)
+const catSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  age: {
+    type: Number,
+    min: 0,
+    max: 40,
+  },
+  color: {
+    type: String,
+    minlength: 3,
+  },
+  vetVisits: [ Date ],
+  toys: [ String ],
+  // ObjectId isn't a built-in JavaScript class (unlike String, Number, etc.)
+  owners: [ Schema.Types.ObjectId ],
+  countryCode: {
+    type: String,
+    // a string of EXACTLY 2 UPPERCASE letters
+    match: /^[A-Z][A-Z]$/,
+  },
+  photo: String,
+});
+
 // the variable "Cat" is our Mongoose model class
 // the "Cat" model will allow us to make queries on the "cats" collection
 // (Mongoose converts the model name "Cat" into the collection name "cats")
-const Cat = mongoose.model("Cat", { name: String, age: Number });
+const Cat = mongoose.model("Cat", catSchema);
 
 
 
@@ -16,7 +47,7 @@ const Cat = mongoose.model("Cat", { name: String, age: Number });
 // -----------------------------------------------------------------------------
 
 // Mongoose queries return PROMISES so we use the standard then() and catch()
-Cat.create({ name: "Oreo", age: 0.6 })
+Cat.create({ name: "Oreo", age: 0.6, color: "black & white" })
   // then() callbacks get called if the operation is successful
   .then(catDoc => {
     console.log("CAT CREATE WORKED!! 😎", catDoc);
@@ -32,7 +63,7 @@ Cat.create({ name: "Oreo", age: 0.6 })
 // myPromise.then();
 // myPromise.catch();
 
-const niccolosCat = new Cat({ name: "Raja", age: 6 });
+const niccolosCat = new Cat({ name: "Raja", age: 6, toys: [ "Smelly Socks" ] });
 niccolosCat.save()
   .then(catDoc => {
     console.log("Raja CREATE success!! 🤓", catDoc);
@@ -104,6 +135,17 @@ Cat.updateMany(
 })
 .catch(err => {
   console.log("Cat.updateMany() FAILURE!! 💩", err);
+});
+
+Cat.findByIdAndUpdate(
+  "5be43f89a06f24c9a94a2a50",
+  { $push: { toys: "Washing Machine" } }
+) // "$push" is like the push() array method (toys.push("Washing Machine"))
+.then(catDoc => {
+  console.log(`Cat $push WORKED ${catDoc._id}`);
+})
+.catch(err => {
+  console.log("Cat $push FAILURE!! 💩", err);
 });
 
 
