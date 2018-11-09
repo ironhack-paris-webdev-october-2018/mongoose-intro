@@ -1,0 +1,18 @@
+<p>Cat friendly auctions.</p>
+
+<h2>Here are some satisfied customers:</h2>
+
+<ul>
+  {{#each catArray}}
+    <li>
+      <h3>{{this.name}} 😼</h3>
+      <p>{{this.age}} years old</p>
+
+      <h4>Favorite Toys</h4>
+      {{#each this.toys}}
+        <!-- "this" is one of the strings inside the "toys" array -->
+        {{this}}
+      {{/each}}
+    </li>
+  {{/each}}
+</ul>
